@@ -1,22 +1,8 @@
-const ALLOWED_ORIGINS = [
-  'www.nhk.or.jp',
-  'nhk.or.jp',
-];
-
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
-
-function isAllowed(url) {
-  try {
-    const { hostname } = new URL(url);
-    return ALLOWED_ORIGINS.some(o => hostname === o || hostname.endsWith('.' + o));
-  } catch {
-    return false;
-  }
-}
 
 function corsResponse(body, init = {}) {
   const res = new Response(body, init);
@@ -39,10 +25,6 @@ export default {
 
     if (!target) {
       return corsResponse('Missing ?url= parameter', { status: 400 });
-    }
-
-    if (!isAllowed(target)) {
-      return corsResponse('URL not allowed', { status: 403 });
     }
 
     try {
