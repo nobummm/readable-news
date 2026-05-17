@@ -321,15 +321,24 @@
 </div>
 
 <script>
+// Worker URL: デプロイ後にここを書き換えてください
+// 例: 'https://readable-news-proxy.YOUR_SUBDOMAIN.workers.dev'
+const WORKER_URL = '';
+
 const PROXIES = [
   'https://corsproxy.io/?url=',
   'https://api.allorigins.win/raw?url=',
   'https://thingproxy.freeboard.io/fetch/',
 ];
 
+function buildProxyList() {
+  const worker = WORKER_URL ? [`${WORKER_URL.replace(/\/$/, '')}/?url=`] : [];
+  return [...worker, ...PROXIES];
+}
+
 async function fetchWithFallback(targetUrl) {
   let lastError;
-  for (const proxy of PROXIES) {
+  for (const proxy of buildProxyList()) {
     try {
       const res = await fetch(proxy + encodeURIComponent(targetUrl), {
         signal: AbortSignal.timeout(8000),
