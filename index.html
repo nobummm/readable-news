@@ -364,7 +364,7 @@ const CATEGORIES = [
   { id: 'cat7', label: 'スポーツ' },
 ];
 
-const RSS_BASE = 'https://www.nhk.or.jp/rss/news/';
+const RSS_BASE = 'https://www3.nhk.or.jp/rss/news/';
 
 let currentCat = 'cat0';
 let articles = [];
@@ -393,7 +393,7 @@ async function loadFeed(cat) {
   const listEl = document.getElementById('list-view');
   listEl.innerHTML = `<div class="status-msg"><div class="spinner"></div>読み込み中…</div>`;
 
-  const rssUrl = `${RSS_BASE}${cat}.rss`;
+  const rssUrl = `${RSS_BASE}${cat}.xml`;
 
   try {
     const text = await fetchWithFallback(rssUrl);
