@@ -254,6 +254,14 @@
       line-height: 1.3;
     }
 
+    /* Hide any fixed/sticky remnants inside extracted content */
+    .reader-content [style*="position:fixed"],
+    .reader-content [style*="position: fixed"],
+    .reader-content [style*="position:sticky"],
+    .reader-content [style*="position: sticky"] {
+      display: none !important;
+    }
+
     .reader-loading {
       text-align: center;
       padding: 64px 16px;
@@ -457,6 +465,32 @@ async function openReader(idx) {
     const baseEl = doc.createElement('base');
     baseEl.href = art.link;
     doc.head.appendChild(baseEl);
+
+    // Remove fixed/sticky elements and site navigation before Readability parses
+    doc.querySelectorAll('header, footer, nav, aside, [role="banner"], [role="navigation"], [role="complementary"]').forEach(el => el.remove());
+    doc.querySelectorAll('*').forEach(el => {
+      const pos = getComputedStyle ? null : el.style.position;
+      const stylePos = el.style.position;
+      if (stylePos === 'fixed' || stylePos === 'sticky') el.remove();
+    });
+    const noiseSelectors = [
+      '[class*="header"]', '[class*="Header"]',
+      '[class*="footer"]', '[class*="Footer"]',
+      '[class*="nav"]',    '[class*="Nav"]',
+      '[class*="menu"]',   '[class*="Menu"]',
+      '[class*="banner"]', '[class*="Banner"]',
+      '[class*="sticky"]', '[class*="Sticky"]',
+      '[class*="fixed"]',  '[class*="Fixed"]',
+      '[id*="header"]',    '[id*="Header"]',
+      '[id*="footer"]',    '[id*="Footer"]',
+      '[id*="nav"]',       '[id*="Nav"]',
+    ];
+    doc.querySelectorAll(noiseSelectors.join(',')).forEach(el => {
+      // Only remove if outside the main content area
+      if (!el.closest('article, [role="main"], main, .article, .content, .entry')) {
+        el.remove();
+      }
+    });
 
     const reader = new Readability(doc);
     const parsed = reader.parse();
